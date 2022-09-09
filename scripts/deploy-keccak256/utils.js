@@ -29,6 +29,23 @@ exports.getZkBNBProxy = async function (addr) {
     return ZkBNB.attach(addr);
 }
 
+exports.getZkBNBProxyAndInterface = async function (addr) {
+    // Get utils contract
+    const Utils = await ethers.getContractFactory("Utils")
+    const utils = await Utils.deploy()
+    await utils.deployed()
+
+    // zkbnb
+    const ZkBNB = await ethers.getContractFactory('OldZkBNB', {
+        libraries: {
+            Utils: utils.address
+        }
+    });
+    const zkbnb = ZkBNB.attach(addr);
+    const zkbnbInterface = ZkBNB.interface;
+    return { zkbnb, zkbnbInterface };
+}
+
 // Get the keccak256 hash of a specified string name
 // eg: getKeccak256('zkbnb') = '0x621eacce7c1f02dbf62859801a97d1b2903abc1c3e00e28acfb32cdac01ab36d'
 exports.getKeccak256 = function (name) {
