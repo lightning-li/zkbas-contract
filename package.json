@@ -28,9 +28,10 @@
     "dotenv": "^16.0.2",
     "ethereum-waffle": "^3.4.4",
     "ethers": "^5.6.4",
-    "hardhat": "^2.9.7",
+    "hardhat": "^2.9.9",
     "hardhat-abi-exporter": "^2.9.0",
     "hardhat-contract-sizer": "^2.5.1",
+    "hardhat-gas-reporter": "^1.0.9",
     "hardhat-watcher": "^2.3.0"
   },
   "dependencies": {

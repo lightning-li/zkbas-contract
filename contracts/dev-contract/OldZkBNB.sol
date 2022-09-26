@@ -22,6 +22,7 @@ import "./OldZNSController.sol";
 import "../Proxy.sol";
 import "../UpgradeableMaster.sol";
 import "../Storage.sol";
+import "hardhat/console.sol";
 
 /// @title ZkBNB main contract
 /// @author ZkBNB Team
@@ -544,6 +545,8 @@ contract OldZkBNB is UpgradeableMaster, Events, Storage, Config, ReentrancyGuard
 //        totalBlocksCommitted += uint32(_newBlocksData.length);
 //
 //        require(totalCommittedPriorityRequests <= totalOpenPriorityRequests, "j");
+        uint g0 = gasleft();
+        console.log("g0:", g0);
         delegateAdditional();
     }
 
@@ -996,6 +999,7 @@ contract OldZkBNB is UpgradeableMaster, Events, Storage, Config, ReentrancyGuard
     /// @notice Should be only use to delegate the external calls as it passes the calldata
     /// @notice All functions delegated to additional contract should NOT be nonReentrant
     function delegateAdditional() internal {
+        // console.log("0");
         address _target = address(additionalZkBNB);
         assembly {
         // The pointer to the free memory slot

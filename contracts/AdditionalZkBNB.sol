@@ -20,6 +20,7 @@ import "./Bytes.sol";
 import "./TxTypes.sol";
 
 import "./UpgradeableMaster.sol";
+import "hardhat/console.sol";
 
 /// @title ZkBNB additional main contract
 /// @author ZkBNB
@@ -521,24 +522,29 @@ contract AdditionalZkBNB is Storage, Config, Events, ReentrancyGuard, IERC721Rec
     )
     external
     {
+        uint256 g1 = gasleft();
         requireActive();
         governance.requireActiveValidator(msg.sender);
+        uint256 g2 = gasleft();
         // Check that we commit blocks after last committed block
         // incorrect previous block data
         require(storedBlockHashes[totalBlocksCommitted] == hashStoredBlockInfo(_lastCommittedBlockData), "i");
-
+        uint256 g3 = gasleft();
+        uint256[] memory gs = new uint[](_newBlocksData.length*2);
         for (uint32 i = 0; i < _newBlocksData.length; ++i) {
             _lastCommittedBlockData = commitOneBlock(_lastCommittedBlockData, _newBlocksData[i]);
-
+            gs[2*i] = gasleft();
             totalCommittedPriorityRequests += _lastCommittedBlockData.priorityOperations;
             storedBlockHashes[_lastCommittedBlockData.blockNumber] = hashStoredBlockInfo(_lastCommittedBlockData);
-
+            gs[2*i+1] = gasleft();
             emit BlockCommit(_lastCommittedBlockData.blockNumber);
         }
 
         totalBlocksCommitted += uint32(_newBlocksData.length);
 
         require(totalCommittedPriorityRequests <= totalOpenPriorityRequests, "j");
+        console.log("gs:", g1, g2, g3);
+        console.log("gs:", gs[0], gs[1]);
     }
     // @dev This function is only for test
     // TODO delete this function
@@ -588,7 +594,9 @@ contract AdditionalZkBNB is Storage, Config, Events, ReentrancyGuard, IERC721Rec
         StoredBlockInfo memory _previousBlock,
         CommitBlockInfo memory _newBlockData
     ) internal view returns (bytes32) {
+        uint256 gas0 = gasleft();
         uint256[] memory pubData = Utils.bytesToUint256Arr(_newBlockData.publicData);
+        console.log("cb:", gas0 - gasleft());
         bytes32 converted = keccak256(abi.encodePacked(
                 uint256(_newBlockData.blockNumber), // block number
                 uint256(_newBlockData.timestamp), // time stamp
@@ -597,6 +605,7 @@ contract AdditionalZkBNB is Storage, Config, Events, ReentrancyGuard, IERC721Rec
                 pubData, // pub data
                 uint256(_newBlockData.publicDataOffsets.length) // on chain ops count
             ));
+        console.log("cb1:", gas0 - gasleft());
         return converted;
     }
 
